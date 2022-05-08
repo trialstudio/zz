@@ -1,4 +1,4 @@
-import DeployVersions
+import DeploymentVersions
 
 def info() {
     echo 'infos'
@@ -41,7 +41,7 @@ def t() {
 }
 
 def entryMap = [
-        "springV1": new DeployVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1")
+        "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1")
 ]
 
 def entry(String deploymentType) {
