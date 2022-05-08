@@ -10,8 +10,8 @@ class DeploymentVersions {
     }
 
     def print() {
-        println "$buildVersion"
-        println "$deployToProdVersion"
-        println "$deployToDevVersion"
+        println "a$buildVersion"
+        println "b$deployToProdVersion"
+        println "c$deployToDevVersion"
     }
 }
