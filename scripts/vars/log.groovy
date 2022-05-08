@@ -40,9 +40,11 @@ def t() {
     this.entry("springV1")
 }
 
-def entryMap = [
-        "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1")
-]
+def entryMap() {
+    return [
+            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1")
+    ]
+}
 
 def entry(String deploymentType) {
     this.entryMap.get(deploymentType).print()
