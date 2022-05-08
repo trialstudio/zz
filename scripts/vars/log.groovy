@@ -37,7 +37,7 @@ def jobDslUtil(String appName) {
 }
 
 def t() {
-    entry("springV1")
+    this.entry("springV1")
 }
 
 def entryMap = [
@@ -45,5 +45,5 @@ def entryMap = [
 ]
 
 def entry(String deploymentType) {
-    entryMap.get(deploymentType).print()
+    this.entryMap.get(deploymentType).print()
 }
