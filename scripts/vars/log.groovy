@@ -1,3 +1,3 @@
 def info() {
-    echo 'info'
+    echo 'infos'
 }
