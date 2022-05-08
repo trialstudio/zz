@@ -9,9 +9,7 @@ class DeploymentVersions {
         this.deployToDevVersion = deployToDevVersion
     }
 
-    def print() {
-        println "a$buildVersion"
-        println "b$deployToProdVersion"
-        println "c$deployToDevVersion"
+    def getVersions() {
+        return [buildVersion, deployToProdVersion, deployToDevVersion]
     }
 }

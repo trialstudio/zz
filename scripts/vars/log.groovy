@@ -47,5 +47,30 @@ def entryMap() {
 }
 
 def entry(String deploymentType) {
-    echo entryMap().get(deploymentType).getBuildVersion()
+    def engine = new groovy.text.SimpleTemplateEngine()
+
+    for (version in entryMap().get(deploymentType).getVersions) {
+        renderedScript = engine.createTemplate("${libraryResource version}").make(['app_name': 'test-app']).toString()
+        def scriptTxt = """
+pipelineJob("${app.name}-build") {
+    definition {
+        cps {
+            script(${renderedScript})
+        }
+    }
+}
+"""
+
+        node {
+            jobDsl failOnSeedCollision: true,
+                    ignoreMissingFiles: false,
+                    ignoreExisting: false,
+                    removedConfigFilesAction: 'DELETE',
+                    removedJobAction: 'DELETE',
+                    removedViewAction: 'DELETE',
+                    sandbox: false,
+                    unstableOnDeprecation: true,
+                    scriptText: scriptTxt
+        }
+    }
 }
