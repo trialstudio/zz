@@ -61,6 +61,7 @@ pipelineJob("test-app-build") {
     }
 }
 """
+        println scriptTxt
 
         node {
             jobDsl failOnSeedCollision: true,
