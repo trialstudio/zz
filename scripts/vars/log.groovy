@@ -50,7 +50,8 @@ def entry(String deploymentType) {
     def engine = new groovy.text.SimpleTemplateEngine()
 
     for (version in entryMap().get(deploymentType).getVersions()) {
-        renderedScript = engine.createTemplate("${libraryResource version}.groovy").make(['app_name': 'test-app']).toString()
+        def versionFile = "${version}.groovy"
+        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': 'test-app']).toString()
         def scriptTxt = """
 pipelineJob("${app.name}-build") {
     definition {
