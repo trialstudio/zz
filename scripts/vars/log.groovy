@@ -56,7 +56,9 @@ def entry(String deploymentType) {
 pipelineJob("test-app-build") {
     definition {
         cps {
-            script(${renderedScript})
+            script('''
+${renderedScript}
+''')
         }
     }
 }
