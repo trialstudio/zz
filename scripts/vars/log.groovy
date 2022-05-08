@@ -53,7 +53,7 @@ def entry(String deploymentType) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': 'test-app']).toString()
         def scriptTxt = """
-pipelineJob("\${app_name}-build") {
+pipelineJob("test-app-build") {
     definition {
         cps {
             script(${renderedScript})
