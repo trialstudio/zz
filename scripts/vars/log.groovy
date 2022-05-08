@@ -1,0 +1,3 @@
+def info() {
+    println 'info'
+}
