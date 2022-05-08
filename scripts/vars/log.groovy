@@ -1,3 +1,3 @@
 def info() {
-    println 'info'
+    echo 'info'
 }
