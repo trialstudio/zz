@@ -47,5 +47,5 @@ def entryMap() {
 }
 
 def entry(String deploymentType) {
-    entryMap().get(deploymentType).print()
+    echo entryMap().get(deploymentType).getBuildVersion()
 }
