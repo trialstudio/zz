@@ -45,27 +45,29 @@ def t() {
             team.apps.each { app ->
                 createJobs(app.name, app.deploymentType)
             }
-            def categorizedViewTxt = """
-                categorizedJobsView('${team.name}') {
-                    jobs {
-                        regex('^(${team.apps.collect{ it.name }.join("|")})-(build|deploy-to-dev|deploy-to-prod)')
-                        names('')
-                    }
-                    categorizationCriteria {
-                        regexGroupingRule(/^(.*)-(build|deploy-to-dev|deploy-to-prod)/)
-                    }
-                    columns {
-                        status()
-                        categorizedJob()
-                        lastSuccess()
-                        lastFailure()
-                        lastDuration()
-                        buildButton()
-                    }
-                }
-                """
-            println categorizedViewTxt
-            addJobDsl(categorizedViewTxt)
+            addCategorizedViewJobDsl(team.name,
+            "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
+            "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
+//            def categorizedViewTxt = """
+//                categorizedJobsView('${team.name}') {
+//                    jobs {
+//                        regex('^(${team.apps.collect{ it.name }.join("|")})-(build|deploy-to-dev|deploy-to-prod)')
+//                        names('')
+//                    }
+//                    categorizationCriteria {
+//                        regexGroupingRule(/^(.*)-(build|deploy-to-dev|deploy-to-prod)/)
+//                    }
+//                    columns {
+//                        status()
+//                        categorizedJob()
+//                        lastSuccess()
+//                        lastFailure()
+//                        lastDuration()
+//                        buildButton()
+//                    }
+//                }
+//                """
+//            addJobDsl(categorizedViewTxt)
         }
     }
 }
@@ -82,24 +84,24 @@ def createJobs(String appName, String deploymentType) {
 
     def version = deploymentTypeTemplateMapping().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
-        jobDslPipeline("${appName}-build",
+        addPipelineJobDsl("${appName}-build",
                 engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 
     version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToProdVersion()
     if (version?.trim()) {
-        jobDslPipeline("${appName}-deploy-to-prod",
+        addPipelineJobDsl("${appName}-deploy-to-prod",
                 engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 
     version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToDevVersion()
     if (version?.trim()) {
-        jobDslPipeline("${appName}-deploy-to-dev",
+        addPipelineJobDsl("${appName}-deploy-to-dev",
                 engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 }
 
-def jobDslPipeline(String jobName, String renderedPipeline) {
+def addPipelineJobDsl(String jobName, String renderedPipeline) {
     def scriptTxt = """
             pipelineJob('$jobName') {
                 definition {
@@ -111,6 +113,29 @@ def jobDslPipeline(String jobName, String renderedPipeline) {
             """
 
     addJobDsl(scriptTxt)
+}
+
+def addCategorizedViewJobDsl(String viewName, String jobRegex, String regexGroupingRule) {
+    def categorizedViewTxt = """
+                categorizedJobsView(/${viewName}/) {
+                    jobs {
+                        regex('${jobRegex}')
+                        names('')
+                    }
+                    categorizationCriteria {
+                        regexGroupingRule(/${regexGroupingRule}/)
+                    }
+                    columns {
+                        status()
+                        categorizedJob()
+                        lastSuccess()
+                        lastFailure()
+                        lastDuration()
+                        buildButton()
+                    }
+                }
+                """
+    addJobDsl(categorizedViewTxt)
 }
 
 def addJobDsl(String scriptTxt) {
