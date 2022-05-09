@@ -4,10 +4,8 @@ class BuildAndDeployTemplateRenderer {
     private HashMap<String, String> environmentTemplateMap
     private String buildTemplate
     private static SimpleTemplateEngine engine = new SimpleTemplateEngine()
-    private Closure templateContentRetriever
 
-    BuildAndDeployTemplateRenderer(String buildTemplate, HashMap<String, String> environmentTemplateMap, Closure templateContentRetriever) {
-        this.templateContentRetriever = templateContentRetriever
+    BuildAndDeployTemplateRenderer(String buildTemplate, HashMap<String, String> environmentTemplateMap) {
         this.buildTemplate = buildTemplate
         this.environmentTemplateMap = environmentTemplateMap
     }
@@ -17,10 +15,10 @@ class BuildAndDeployTemplateRenderer {
         return engine.createTemplate(templateContentRetriever(buildTemplate)).make(bindings).toString()
     }
 
-    List<HashMap<String, String>> renderEnvironmentTemplate(HashMap<String, String> bindings) {
+    List<HashMap<String, String>> renderEnvironmentTemplate(HashMap<String, String> bindings, Closure closure) {
         return environmentTemplateMap.collect {
 //            return [(it.key): engine.createTemplate("${libraryResource it.value}").make(bindings + ["env": it.key]).toString()]
-            return [(it.key): engine.createTemplate(templateContentRetriever(it.value)).make(bindings + ["env": it.key]).toString()]
+            return [(it.key): engine.createTemplate(closure(it.value)).make(bindings + ["env": it.key]).toString()]
         }
     }
 }

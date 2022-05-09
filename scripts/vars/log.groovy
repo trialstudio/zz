@@ -106,8 +106,7 @@ static def deploymentTypeTemplateMappings() {
     return [
             "springV1": new BuildAndDeployTemplateRenderer(
                     "springBuildV1.groovy",
-                    ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"],
-                    { return libraryResource(it) }
+                    ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"]
             )
     ]
 }
@@ -121,7 +120,7 @@ def g() {
                 def rendered = deploymentTypeTemplateMappings().get(app.deploymentType)
                 def defaultBindings = ["appName": app.name, "team": team.name]
                 if (rendered instanceof BuildAndDeployTemplateRenderer) {
-                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings)f
+                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
                     def extendedBindings = environmentTemplateMapping + defaultBindings
 
                     addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings))
