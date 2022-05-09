@@ -42,8 +42,10 @@ def t() {
     for (a in teamApps) {
         println a
     }
-    teamApps.each {
-        createJobs(it.name, it.deploymentType)
+    teamApps.each { team ->
+        team.each { app ->
+            createJobs(app.name, app.deploymentType)
+        }
     }
 //    createJobs("springV1", "spring-app")
 //    createJobs("miscTaskV1", "misc-task")
