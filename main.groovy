@@ -1,11 +1,7 @@
 def x = ["one": "two"]
 def y = ["three": "four"]
 
-println x
-println y
+def z = [x, y]
 
-x = x + y
-y.three = "five"
-
-println x
-println y
+println z
+println z.sum()

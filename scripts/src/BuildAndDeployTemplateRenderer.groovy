@@ -15,10 +15,10 @@ class BuildAndDeployTemplateRenderer {
         return engine.createTemplate(templateContentRetriever(buildTemplate)).make(bindings).toString()
     }
 
-    List<HashMap<String, String>> renderEnvironmentTemplate(HashMap<String, String> bindings, Closure closure) {
+    HashMap<String, String> renderEnvironmentTemplate(HashMap<String, String> bindings, Closure closure) {
         return environmentTemplateMap.collect {
 //            return [(it.key): engine.createTemplate("${libraryResource it.value}").make(bindings + ["env": it.key]).toString()]
             return [(it.key): engine.createTemplate(closure(it.value)).make(bindings + ["env": it.key]).toString()]
-        }
+        }.sum()
     }
 }
