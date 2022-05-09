@@ -76,7 +76,7 @@ def entry(String deploymentType, String appName) {
 
 def jobDslPipeline(String jobName, String renderedPipeline) {
     def scriptTxt = """
-            pipelineJob($jobName) {
+            pipelineJob('$jobName') {
                 definition {
                     cps {
                         script('''${renderedPipeline}''')
