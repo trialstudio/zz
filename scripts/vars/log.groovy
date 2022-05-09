@@ -47,7 +47,7 @@ def t() {
             team.apps.each { app ->
                 createJobs(app.name, app.deploymentType)
             }
-
+            println team
             addJobDsl("""
                 categorizedJobsView(${team.name}) {
                     jobs {
