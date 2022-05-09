@@ -48,7 +48,8 @@ def t() {
             def categorizedViewTxt = """
                 categorizedJobsView('${team.name}') {
                     jobs {
-                        names('${team.apps.collect{ it.name }.join("','")}')
+                        regex('^(${team.apps.collect{ it.name }.join("|")})-(build|deploy-to-dev|deploy-to-prod)')
+                        names('')
                     }
                     categorizationCriteria {
                         regexGroupingRule(/^(.*)-(build|deploy-to-dev|deploy-to-prod)/)
