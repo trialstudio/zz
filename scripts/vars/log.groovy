@@ -43,7 +43,8 @@ def t() {
 
 def entryMap() {
     return [
-            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1")
+            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
+            "miscTaskV1": new DeploymentVersions("miscTaskBuildV1.groovy", "", "")
     ]
 }
 
