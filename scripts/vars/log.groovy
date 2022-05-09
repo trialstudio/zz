@@ -122,10 +122,10 @@ def g() {
                 if (rendered instanceof BuildAndDeployTemplateRenderer) {
                     def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
                     def extendedBindings = environmentTemplateMapping + defaultBindings
-                    println environmentTemplateMapping
+
                     addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings, { libraryResource it }))
                     environmentTemplateMapping.each {
-                        addPipelineJobDsl("${app.name}-${it.key}", it.value)
+                        addPipelineJobDsl("${app.name}-deploy-to-${it.key}", it.value)
                     }
                 }
             }
@@ -136,13 +136,32 @@ def g() {
     }
 }
 
-def createBuildAndDeployJobs(String appName) {
+def p() {
+    node {
+        def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
 
-}
-
-def addBuildTemplate(String appName, String templateName, HashMap bindings) {
-    new HashMap(new HashMap<String, String>())
-    addPipelineJobDsl("${appName}-build", engin)
+        teamApps.each { team ->
+            team.apps.each { app ->
+                switch(app.type) {
+                    case "springboot": echo 'test'
+                }
+//                def rendered = deploymentTypeTemplateMappings().get(app.deploymentType)
+//                def defaultBindings = ["appName": app.name, "team": team.name]
+//                if (rendered instanceof BuildAndDeployTemplateRenderer) {
+//                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
+//                    def extendedBindings = environmentTemplateMapping + defaultBindings
+//
+//                    addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings, { libraryResource it }))
+//                    environmentTemplateMapping.each {
+//                        addPipelineJobDsl("${app.name}-deploy-to-${it.key}", it.value)
+//                    }
+//                }
+            }
+//            addCategorizedViewJobDsl(team.name,
+//                    "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
+//                    "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
+        }
+    }
 }
 
 def addPipelineJobDsl(String jobName, String renderedPipeline) {

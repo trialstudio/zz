@@ -1,9 +1,9 @@
 - name: "team-a"
   apps:
     - name: "appone"
-      deploymentType: "springV1"
+      type: "springboot"
     - name: "apptwo"
-      deploymentType: "springV1"
+      type: "springboot"
 
 #- name: "team-b"
 #  apps:

@@ -1,7 +1,6 @@
-def x = ["one": "two"]
-def y = ["three": "four"]
+def x = "one"
+def y = ["two", "three"]
 
-def z = [x, y]
+def z = x + y.ad
 
 println z
-println z.sum()
