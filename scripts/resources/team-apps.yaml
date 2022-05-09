@@ -1,13 +1,13 @@
 - name: "team-a"
   apps:
-    - name: "appone"
+    - name: "one"
       type: "springboot"
-    - name: "apptwo"
+    - name: "two"
       type: "springboot"
 
-#- name: "team-b"
-#  apps:
-#    - name: "one"
-#      deploymentType: "type1"
-#    - name: "two"
-#      deploymentType: "type2"
+- name: "team-c"
+  apps:
+    - name: "this"
+      type: "springboot"
+    - name: "that"
+      type: "springboot"

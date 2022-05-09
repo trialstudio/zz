@@ -1,4 +1,0 @@
-enum Same {
-    one,
-    two
-}

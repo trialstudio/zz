@@ -1,151 +1,19 @@
 import groovy.text.SimpleTemplateEngine
 
-def info() {
-    echo 'infos'
-    echo "${libraryResource 'test.json'}"
-}
-
-def jobDslUtil(String appName) {
-    node {
-        for (buildType in ['build', 'dev-promotion', 'prod-promotion'])
-            pipelineJob("${app.name}-${buildType}") {
-                definition {
-                    cps {
-                        script(readFileFromWorkspace('pipeline.groovy'))
-                    }
-                }
-            }
-        categorizedJobsView('example') {
-            jobs {
-                team.apps.each {
-                    name(it.name)
-                }
-            }
-            categorizationCriteria {
-                regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
-            }
-            columns {
-                status()
-                categorizedJob()
-                lastSuccess()
-                lastFailure()
-                lastDuration()
-                buildButton()
-            }
-        }
-    }
-}
-
-def t() {
-    node {
-        def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
-
-        teamApps.each { team ->
-            team.apps.each { app ->
-                createJobs(app.name, app.deploymentType)
-            }
-            addCategorizedViewJobDsl(team.name,
-            "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
-            "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
-//            def categorizedViewTxt = """
-//                categorizedJobsView('${team.name}') {
-//                    jobs {
-//                        regex('^(${team.apps.collect{ it.name }.join("|")})-(build|deploy-to-dev|deploy-to-prod)')
-//                        names('')
-//                    }
-//                    categorizationCriteria {
-//                        regexGroupingRule(/^(.*)-(build|deploy-to-dev|deploy-to-prod)/)
-//                    }
-//                    columns {
-//                        status()
-//                        categorizedJob()
-//                        lastSuccess()
-//                        lastFailure()
-//                        lastDuration()
-//                        buildButton()
-//                    }
-//                }
-//                """
-//            addJobDsl(categorizedViewTxt)
-        }
-    }
-}
-
-static def deploymentTypeTemplateMapping() {
-    return [
-//            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
-//            "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")
-    ]
-}
-
-def createJobs(String appName, String deploymentType) {
-    def engine = new SimpleTemplateEngine()
-
-    def version = deploymentTypeTemplateMapping().get(deploymentType).getBuildVersion()
-    if (version?.trim()) {
-        addPipelineJobDsl("${appName}-build",
-                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
-    }
-
-    version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToProdVersion()
-    if (version?.trim()) {
-        addPipelineJobDsl("${appName}-deploy-to-prod",
-                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
-    }
-
-    version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToDevVersion()
-    if (version?.trim()) {
-        addPipelineJobDsl("${appName}-deploy-to-dev",
-                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
-    }
-}
-
-import BuildAndDeployTemplateRenderer
-
-static def deploymentTypeTemplateMappings() {
-    return [
-            "springV1": new BuildAndDeployTemplateRenderer(
-                    "springBuildV1.groovy",
-                    ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"]
-            )
-    ]
-}
-
-def g() {
-    node {
-        def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
-
-        teamApps.each { team ->
-            team.apps.each { app ->
-                def rendered = deploymentTypeTemplateMappings().get(app.deploymentType)
-                def defaultBindings = ["appName": app.name, "team": team.name]
-                if (rendered instanceof BuildAndDeployTemplateRenderer) {
-                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
-                    def extendedBindings = environmentTemplateMapping + defaultBindings
-
-                    addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings, { libraryResource it }))
-                    environmentTemplateMapping.each {
-                        addPipelineJobDsl("${app.name}-deploy-to-${it.key}", it.value)
-                    }
-                }
-            }
-            addCategorizedViewJobDsl(team.name,
-                    "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
-                    "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
-        }
-    }
-}
-
-def p(HashMap<String, String> templateBindings) {
+def initializePipelines() {
     def templateEngine = new SimpleTemplateEngine()
-    def renderer = { templateEngine.createTemplate("${libraryResource it}").make(templateBindings).toString() }
+    def renderer = { template, bindings ->
+            templateEngine.createTemplate("${libraryResource template}").make(bindings).toString()
+        }
+
     node {
         def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
 
         teamApps.each { team ->
             team.apps.each { app ->
+                def defaultBindings = ["team": team.name, "app": app.name]
                 switch(app.type) {
-                    case "springboot": addSpringbootPipelines(app.name, renderer)
+                    case "springboot": addSpringbootPipelines(app.name, renderer, defaultBindings)
                         break
                     default: echo 'type not found'
                 }
@@ -157,12 +25,10 @@ def p(HashMap<String, String> templateBindings) {
     }
 }
 
-
-
-def addSpringbootPipelines(String app, Closure renderer) {
-    addPipelineJobDsl("${app}-build", renderer("springboot.groovy"))
-    addPipelineJobDsl("${app}-deploy-to-dev", renderer("argoDeployment.groovy"))
-    addPipelineJobDsl("${app}-deploy-to-prod", renderer("argoDeployment.groovy"))
+def addSpringbootPipelines(String app, Closure renderer, HashMap<String, String> defaultBindings) {
+    addPipelineJobDsl("${app}-build", renderer("springboot.groovy", defaultBindings + ["deployToDevJob": "${app}-deploy-to-dev"]))
+    addPipelineJobDsl("${app}-deploy-to-dev", renderer("argoDeployment.groovy", defaultBindings))
+    addPipelineJobDsl("${app}-deploy-to-prod", renderer("argoDeployment.groovy", defaultBindings))
 }
 
 def addPipelineJobDsl(String jobName, String renderedPipeline) {
