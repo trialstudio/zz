@@ -38,36 +38,42 @@ def jobDslUtil(String appName) {
 }
 
 def t() {
-    def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
-    for (a in teamApps) {
-        println a
-    }
-    teamApps.each { team ->
-        team.apps.each { app ->
-            createJobs(app.name, app.deploymentType)
+    node {
+        def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
+        for (a in teamApps) {
+            println a
         }
+        teamApps.each { team ->
+            team.apps.each { app ->
+                createJobs(app.name, app.deploymentType)
+            }
 
-        categorizedJobsView(team.name) {
-            jobs {
-                team.apps.each {
-                    name(it.name)
+        addJobDsl("""
+            categorizedJobsView(team.name) {
+                jobs {
+                    names("${team.apps.collect{it.name}}")
+                    team.apps.each {
+                        name(it.name)
+                    }
+                }
+                categorizationCriteria {
+                    regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
+                }
+                columns {
+                    status()
+                    categorizedJob()
+                    lastSuccess()
+                    lastFailure()
+                    lastDuration()
+                    buildButton()
                 }
             }
-            categorizationCriteria {
-                regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
-            }
-            columns {
-                status()
-                categorizedJob()
-                lastSuccess()
-                lastFailure()
-                lastDuration()
-                buildButton()
-            }
+            """)
+
         }
-    }
 //    createJobs("springV1", "spring-app")
 //    createJobs("miscTaskV1", "misc-task")
+    }
 }
 
 static def deploymentTypeMapping() {
@@ -114,15 +120,17 @@ def jobDslPipeline(String jobName, String renderedPipeline) {
             """
     println scriptTxt
 
-    node {
-        jobDsl failOnSeedCollision: true,
-                ignoreMissingFiles: false,
-                ignoreExisting: false,
-                removedConfigFilesAction: 'DELETE',
-                removedJobAction: 'DELETE',
-                removedViewAction: 'DELETE',
-                sandbox: false,
-                unstableOnDeprecation: true,
-                scriptText: scriptTxt
-    }
+    addJobDsl(scriptTxt)
+}
+
+def addJobDsl(String scriptTxt) {
+    jobDsl failOnSeedCollision: true,
+            ignoreMissingFiles: false,
+            ignoreExisting: false,
+            removedConfigFilesAction: 'DELETE',
+            removedJobAction: 'DELETE',
+            removedViewAction: 'DELETE',
+            sandbox: false,
+            unstableOnDeprecation: true,
+            scriptText: scriptTxt
 }
