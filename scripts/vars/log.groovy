@@ -122,7 +122,7 @@ def g() {
                 if (rendered instanceof BuildAndDeployTemplateRenderer) {
                     def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
                     def extendedBindings = environmentTemplateMapping.collect {} + defaultBindings
-
+                    println environmentTemplateMapping
                     addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings))
                     environmentTemplateMapping.each {
                         addPipelineJobDsl("${app.name}-${it.key}", it.value)
