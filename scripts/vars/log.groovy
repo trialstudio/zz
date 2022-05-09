@@ -61,7 +61,7 @@ def entry(String deploymentType, String appName) {
                     }
                 }
             }
-            """.stripIndent()
+            """
         println scriptTxt
 
         node {
