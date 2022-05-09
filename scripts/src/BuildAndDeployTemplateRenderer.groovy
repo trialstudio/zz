@@ -18,8 +18,6 @@ class BuildAndDeployTemplateRenderer {
     HashMap<String, String> renderEnvironmentTemplate(HashMap<String, String> bindings, Closure templateContentRetriever) {
         return environmentTemplateMap.collect {
 //            return [(it.key): engine.createTemplate("${libraryResource it.value}").make(bindings + ["env": it.key]).toString()]
-            println it.key
-            println closure(it.value)
             return [(it.key): engine.createTemplate(templateContentRetriever(it.value)).make(bindings + ["env": it.key]).toString()]
         }.sum()
     }
