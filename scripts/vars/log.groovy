@@ -43,7 +43,7 @@ def t() {
         println a
     }
     teamApps.each { team ->
-        team.each { app ->
+        team.apps.each { app ->
             createJobs(app.name, app.deploymentType)
         }
     }
