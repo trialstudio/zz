@@ -1,4 +1,5 @@
 import DeploymentVersions
+import groovy.text.SimpleTemplateEngine
 
 def info() {
     echo 'infos'
@@ -47,9 +48,8 @@ def entryMap() {
 }
 
 def entry(String deploymentType, String appName) {
-    def engine = new groovy.text.SimpleTemplateEngine()
+    def engine = new SimpleTemplateEngine()
 
-    println 'build'
     def version = entryMap().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
@@ -57,7 +57,6 @@ def entry(String deploymentType, String appName) {
         jobDslPipeline("${appName}-build", renderedScript)
     }
 
-    println 'prod'
     version = entryMap().get(deploymentType).getDeployToProdVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
@@ -65,7 +64,6 @@ def entry(String deploymentType, String appName) {
         jobDslPipeline("${appName}-deploy-to-prod", renderedScript)
     }
 
-    println 'dev'
     version = entryMap().get(deploymentType).getDeployToDevVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
