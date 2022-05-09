@@ -1,13 +1,13 @@
 - name: "team-a"
   apps:
-    - name: "this"
-      framework: "springV1"
-    - name: "that"
-      framework: "quarkus"
+    - name: "appone"
+      deploymentType: "springV1"
+    - name: "apptwo"
+      deploymentType: "springV1"
 
-- name: "team-b"
-  apps:
-    - name: "one"
-      framework: "type1"
-    - name: "two"
-      framework: "type2"
+#- name: "team-b"
+#  apps:
+#    - name: "one"
+#      deploymentType: "type1"
+#    - name: "two"
+#      deploymentType: "type2"

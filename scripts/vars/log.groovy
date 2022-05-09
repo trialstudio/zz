@@ -42,35 +42,38 @@ def t() {
     for (a in teamApps) {
         println a
     }
-    entry("springV1", "spring-app")
-    entry("miscTaskV1", "misc-task")
+    teamApps.each {
+        createJobs(it.name, it.deploymentType)
+    }
+//    createJobs("springV1", "spring-app")
+//    createJobs("miscTaskV1", "misc-task")
 }
 
-static def entryMap() {
+static def deploymentTypeMapping() {
     return [
             "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
             "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")
     ]
 }
 
-def entry(String deploymentType, String appName) {
+def createJobs(String appName, String deploymentType) {
     def engine = new SimpleTemplateEngine()
 
-    def version = entryMap().get(deploymentType).getBuildVersion()
+    def version = deploymentTypeMapping().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
         jobDslPipeline("${appName}-build", renderedScript)
     }
 
-    version = entryMap().get(deploymentType).getDeployToProdVersion()
+    version = deploymentTypeMapping().get(deploymentType).getDeployToProdVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
         jobDslPipeline("${appName}-deploy-to-prod", renderedScript)
     }
 
-    version = entryMap().get(deploymentType).getDeployToDevVersion()
+    version = deploymentTypeMapping().get(deploymentType).getDeployToDevVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
