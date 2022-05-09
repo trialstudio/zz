@@ -51,7 +51,7 @@ def t() {
                         names('${team.apps.collect{ it.name }.join("','")}')
                     }
                     categorizationCriteria {
-                        regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
+                        regexGroupingRule(/^(.*)-(build|deploy-to-dev|deploy-to-prod)/)
                     }
                     columns {
                         status()
