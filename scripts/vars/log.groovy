@@ -136,32 +136,33 @@ def g() {
     }
 }
 
-def p() {
+def p(HashMap<String, String> templateBindings) {
+    def templateEngine = new SimpleTemplateEngine()
+    def renderer = { templateEngine.createTemplate("${libraryResource it}").make(templateBindings).toString() }
     node {
         def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
 
         teamApps.each { team ->
             team.apps.each { app ->
                 switch(app.type) {
-                    case "springboot": echo 'test'
+                    case "springboot": addSpringbootPipelines(app.name, renderer)
+                        break
+                    default: echo 'type not found'
                 }
-//                def rendered = deploymentTypeTemplateMappings().get(app.deploymentType)
-//                def defaultBindings = ["appName": app.name, "team": team.name]
-//                if (rendered instanceof BuildAndDeployTemplateRenderer) {
-//                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings, { libraryResource it })
-//                    def extendedBindings = environmentTemplateMapping + defaultBindings
-//
-//                    addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings, { libraryResource it }))
-//                    environmentTemplateMapping.each {
-//                        addPipelineJobDsl("${app.name}-deploy-to-${it.key}", it.value)
-//                    }
-//                }
             }
-//            addCategorizedViewJobDsl(team.name,
-//                    "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
-//                    "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
+            addCategorizedViewJobDsl(team.name,
+                    "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
+                    "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
         }
     }
+}
+
+
+
+def addSpringbootPipelines(String app, Closure renderer) {
+    addPipelineJobDsl("${app}-build", renderer("springboot.groovy"))
+    addPipelineJobDsl("${app}-deploy-to-dev", renderer("argoDeployment.groovy"))
+    addPipelineJobDsl("${app}-deploy-to-prod", renderer("argoDeployment.groovy"))
 }
 
 def addPipelineJobDsl(String jobName, String renderedPipeline) {
