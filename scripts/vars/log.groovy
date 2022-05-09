@@ -1,4 +1,4 @@
-//import DeploymentVersions
+import DeploymentVersions
 
 def info() {
     echo 'infos'
@@ -47,63 +47,51 @@ def entryMap() {
 }
 
 def entry(String deploymentType, String appName) {
-    def engine = new groovy.text.SimpleTemplateEngine()
+    SimpleTemplateEngine engine = new SimpleTemplateEngine()
 
-    def version = entryMap().get(deploymentType).getDeployToProdVersion()
+    def version = entryMap().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': "$appName"]).toString()
-        def scriptTxt = """
-            pipelineJob("${appName}-build") {
+        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
+        jobDslPipeline("${appName}-build", renderedScript)
+    }
+
+    version = entryMap().get(deploymentType).getDeployToProdVersion()
+    if (version?.trim()) {
+        def versionFile = "${version}.groovy"
+        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
+        jobDslPipeline("${appName}-deploy-to-prod", renderedScript)
+    }
+
+    version = entryMap().get(deploymentType).getDeployToDevVersion()
+    if (version?.trim()) {
+        def versionFile = "${version}.groovy"
+        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
+        jobDslPipeline("${appName}-deploy-to-dev", renderedScript)
+    }
+}
+
+def jobDslPipeline(String jobName, String renderedPipeline) {
+    def scriptTxt = """
+            pipelineJob($jobName) {
                 definition {
                     cps {
-                        script('''${renderedScript}''')
+                        script('''${renderedPipeline}''')
                     }
                 }
             }
             """
-        println scriptTxt
+    println scriptTxt
 
-        node {
-            jobDsl failOnSeedCollision: true,
-                    ignoreMissingFiles: false,
-                    ignoreExisting: false,
-                    removedConfigFilesAction: 'DELETE',
-                    removedJobAction: 'DELETE',
-                    removedViewAction: 'DELETE',
-                    sandbox: false,
-                    unstableOnDeprecation: true,
-                    scriptText: scriptTxt
-        }
+    node {
+        jobDsl failOnSeedCollision: true,
+                ignoreMissingFiles: false,
+                ignoreExisting: false,
+                removedConfigFilesAction: 'DELETE',
+                removedJobAction: 'DELETE',
+                removedViewAction: 'DELETE',
+                sandbox: false,
+                unstableOnDeprecation: true,
+                scriptText: scriptTxt
     }
-
-//    version = entryMap().get(deploymentType).getDeployToProdVersion()
-//    if (version?.trim()) {
-//        def versionFile = "${version}.groovy"
-//        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': 'test-app']).toString()
-//        def scriptTxt = """
-//            pipelineJob("${appName}-deploy-to-prod") {
-//                definition {
-//                    cps {
-//                        script('''
-//            ${renderedScript}
-//            ''')
-//                    }
-//                }
-//            }
-//            """.stripIndent()
-//        println scriptTxt
-//
-//        node {
-//            jobDsl failOnSeedCollision: true,
-//                    ignoreMissingFiles: false,
-//                    ignoreExisting: false,
-//                    removedConfigFilesAction: 'DELETE',
-//                    removedJobAction: 'DELETE',
-//                    removedViewAction: 'DELETE',
-//                    sandbox: false,
-//                    unstableOnDeprecation: true,
-//                    scriptText: scriptTxt
-//        }
-//    }
 }

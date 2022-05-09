@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage ('deploy to dev') {
             steps {
-                echo 'deploying ${app_name} to dev'
+                echo 'deploying ${appName} to dev'
             }
         }
     }
