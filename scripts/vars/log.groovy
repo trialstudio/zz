@@ -46,6 +46,25 @@ def t() {
         team.apps.each { app ->
             createJobs(app.name, app.deploymentType)
         }
+
+        categorizedJobsView(team.name) {
+            jobs {
+                team.apps.each {
+                    name(it.name)
+                }
+            }
+            categorizationCriteria {
+                regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
+            }
+            columns {
+                status()
+                categorizedJob()
+                lastSuccess()
+                lastFailure()
+                lastDuration()
+                buildButton()
+            }
+        }
     }
 //    createJobs("springV1", "spring-app")
 //    createJobs("miscTaskV1", "misc-task")
