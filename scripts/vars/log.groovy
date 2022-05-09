@@ -107,7 +107,7 @@ static def deploymentTypeTemplateMappings() {
             "springV1": new BuildAndDeployTemplateRenderer(
                     "springBuildV1.groovy",
                     ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"],
-                    { return "${libraryResource it}" }
+                    { return libraryResource(it) }
             )
     ]
 }
