@@ -38,11 +38,15 @@ def jobDslUtil(String appName) {
 }
 
 def t() {
+    def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
+    for (a in teamApps) {
+        println a
+    }
     entry("springV1", "spring-app")
     entry("miscTaskV1", "misc-task")
 }
 
-def entryMap() {
+static def entryMap() {
     return [
             "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
             "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")

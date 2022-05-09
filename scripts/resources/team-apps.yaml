@@ -1,7 +1,7 @@
 - name: "team-a"
   apps:
     - name: "this"
-      framework: "spring"
+      framework: "springV1"
     - name: "that"
       framework: "quarkus"
 
