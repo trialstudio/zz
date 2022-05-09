@@ -14,13 +14,13 @@ class BuildAndDeployTemplateRenderer {
 
     String renderBuildTemplate(HashMap<String, String> bindings) {
 //        return engine.createTemplate("${libraryResource buildTemplate}").make(bindings).toString()
-        return engine.createTemplate(templateContentRetriever(buildTemplate)).make(bindings).toString()
+        return engine.createTemplate(templateContentRetriever("${buildTemplate}")).make(bindings).toString()
     }
 
     List<HashMap<String, String>> renderEnvironmentTemplate(HashMap<String, String> bindings) {
         return environmentTemplateMap.collect {
 //            return [(it.key): engine.createTemplate("${libraryResource it.value}").make(bindings + ["env": it.key]).toString()]
-            return [(it.key): engine.createTemplate(templateContentRetriever(it.value)).make(bindings + ["env": it.key]).toString()]
+            return [(it.key): engine.createTemplate(templateContentRetriever("${it.value}")).make(bindings + ["env": it.key]).toString()]
         }
     }
 }
