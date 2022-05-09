@@ -3,9 +3,9 @@ class DeploymentVersions {
     def deployToProdVersion
     def deployToDevVersion
     private JobDslTemplate[] templates
-    private static HashMap deploymentTypeTemplateMapping = [
-            "springV1": new JobDslTemplate()
-    ]
+//    private static HashMap deploymentTypeTemplateMapping = [
+//            "springV1": new JobDslTemplate()
+//    ]
 
     DeploymentVersions(buildVersion, deployToProdVersion, deployToDevVersion) {
         this.buildVersion = buildVersion
