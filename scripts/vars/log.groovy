@@ -47,11 +47,10 @@ def t() {
             team.apps.each { app ->
                 createJobs(app.name, app.deploymentType)
             }
-            println team
-            addJobDsl("""
+            def categorizedViewTxt = """
                 categorizedJobsView(${team.name}) {
                     jobs {
-                        names("'${team.apps.collect { it.name }.join("','")}'")
+                        names("'${team.apps.collect{ it.name }.join("','")}'")
                     }
                     categorizationCriteria {
                         regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
@@ -65,7 +64,9 @@ def t() {
                         buildButton()
                     }
                 }
-                """)
+                """
+            println categorizedViewTxt
+            addJobDsl(categorizedViewTxt)
         }
 //    createJobs("springV1", "spring-app")
 //    createJobs("miscTaskV1", "misc-task")
