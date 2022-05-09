@@ -104,7 +104,11 @@ import BuildAndDeployTemplateRenderer
 
 static def deploymentTypeTemplateMappings() {
     return [
-            "springV1": new BuildAndDeployTemplateRenderer("springBuildV1.groovy", ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"])
+            "springV1": new BuildAndDeployTemplateRenderer(
+                    "springBuildV1.groovy",
+                    ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"],
+                    { libraryResource it }
+            )
     ]
 }
 
