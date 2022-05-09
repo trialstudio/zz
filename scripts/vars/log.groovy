@@ -82,23 +82,20 @@ def createJobs(String appName, String deploymentType) {
 
     def version = deploymentTypeTemplateMapping().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
-        def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
-        jobDslPipeline("${appName}-build", renderedScript)
+        jobDslPipeline("${appName}-build",
+                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 
     version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToProdVersion()
     if (version?.trim()) {
-        def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
-        jobDslPipeline("${appName}-deploy-to-prod", renderedScript)
+        jobDslPipeline("${appName}-deploy-to-prod",
+                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 
     version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToDevVersion()
     if (version?.trim()) {
-//        def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString()
-        jobDslPipeline("${appName}-deploy-to-dev", renderedScript)
+        jobDslPipeline("${appName}-deploy-to-dev",
+                engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString())
     }
 }
 
