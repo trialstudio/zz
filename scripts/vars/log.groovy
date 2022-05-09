@@ -39,6 +39,7 @@ def jobDslUtil(String appName) {
 
 def t() {
     entry("springV1", "spring-app")
+    entry("miscTaskV1", "misc-task")
 }
 
 def entryMap() {
