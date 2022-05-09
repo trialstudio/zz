@@ -1,4 +1,3 @@
-import DeploymentVersions
 import groovy.text.SimpleTemplateEngine
 
 def info() {
@@ -74,8 +73,8 @@ def t() {
 
 static def deploymentTypeTemplateMapping() {
     return [
-            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
-            "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")
+//            "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
+//            "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")
     ]
 }
 
@@ -102,11 +101,10 @@ def createJobs(String appName, String deploymentType) {
 }
 
 import BuildAndDeployTemplateRenderer
-import DeploymentEnvironment
 
 static def deploymentTypeTemplateMappings() {
     return [
-            "springV1": new BuildAndDeployTemplateRenderer("springBuildV1.groovy", [DeploymentEnvironment.dev: "argoDeployV1.groovy", DeploymentEnvironment.prod: "argoDeployV1.groovy"])
+            "springV1": new BuildAndDeployTemplateRenderer("springBuildV1.groovy", ["dev": "argoDeployV1.groovy", "prod": "argoDeployV1.groovy"])
     ]
 }
 
@@ -119,7 +117,7 @@ def g() {
                 def rendered = deploymentTypeTemplateMappings().get(app.deploymentType)
                 def defaultBindings = ["appName": app.name, "team": team.name]
                 if (rendered instanceof BuildAndDeployTemplateRenderer) {
-                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings)
+                    def environmentTemplateMapping = rendered.renderEnvironmentTemplate(defaultBindings)f
                     def extendedBindings = environmentTemplateMapping + defaultBindings
 
                     addPipelineJobDsl("${app.name}-build", rendered.renderBuildTemplate(extendedBindings))
