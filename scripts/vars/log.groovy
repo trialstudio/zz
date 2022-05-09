@@ -1,4 +1,5 @@
 import DeploymentVersions
+import groovy.text.SimpleTemplateEngine
 
 def info() {
     echo 'infos'
@@ -47,7 +48,7 @@ def entryMap() {
 }
 
 def entry(String deploymentType, String appName) {
-    SimpleTemplateEngine engine = new SimpleTemplateEngine()
+    def engine = new SimpleTemplateEngine()
 
     def version = entryMap().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
