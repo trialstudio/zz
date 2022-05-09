@@ -37,7 +37,7 @@ def jobDslUtil(String appName) {
 }
 
 def t() {
-    entry("springV1")
+    entry("springV1", "spring-app")
 }
 
 def entryMap() {
@@ -46,23 +46,24 @@ def entryMap() {
     ]
 }
 
-def entry(String deploymentType) {
+def entry(String deploymentType, String appName) {
     def engine = new groovy.text.SimpleTemplateEngine()
 
-    for (version in entryMap().get(deploymentType).getVersions()) {
+    def version = entryMap().get(deploymentType).getDeployToProdVersion()
+    if (version?.trim()) {
         def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': 'test-app']).toString()
+        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': "$appName"]).toString()
         def scriptTxt = """
-pipelineJob("test-app-build") {
-    definition {
-        cps {
-            script('''
-${renderedScript}
-''')
-        }
-    }
-}
-"""
+            pipelineJob("${appName}-build") {
+                definition {
+                    cps {
+                        script('''
+            ${renderedScript}
+            ''')
+                    }
+                }
+            }
+            """.stripIndent()
         println scriptTxt
 
         node {
@@ -77,4 +78,34 @@ ${renderedScript}
                     scriptText: scriptTxt
         }
     }
+
+//    version = entryMap().get(deploymentType).getDeployToProdVersion()
+//    if (version?.trim()) {
+//        def versionFile = "${version}.groovy"
+//        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['app_name': 'test-app']).toString()
+//        def scriptTxt = """
+//            pipelineJob("${appName}-deploy-to-prod") {
+//                definition {
+//                    cps {
+//                        script('''
+//            ${renderedScript}
+//            ''')
+//                    }
+//                }
+//            }
+//            """.stripIndent()
+//        println scriptTxt
+//
+//        node {
+//            jobDsl failOnSeedCollision: true,
+//                    ignoreMissingFiles: false,
+//                    ignoreExisting: false,
+//                    removedConfigFilesAction: 'DELETE',
+//                    removedJobAction: 'DELETE',
+//                    removedViewAction: 'DELETE',
+//                    sandbox: false,
+//                    unstableOnDeprecation: true,
+//                    scriptText: scriptTxt
+//        }
+//    }
 }

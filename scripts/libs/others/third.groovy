@@ -1,3 +1,0 @@
-def third() {
-  println 'third'
-}

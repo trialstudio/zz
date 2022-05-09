@@ -1,0 +1,13 @@
+- name: "team-a"
+  apps:
+    - name: "this"
+      framework: "spring"
+    - name: "that"
+      framework: "quarkus"
+
+- name: "team-b"
+  apps:
+    - name: "one"
+      framework: "type1"
+    - name: "two"
+      framework: "type2"
