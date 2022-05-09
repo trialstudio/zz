@@ -40,15 +40,13 @@ def jobDslUtil(String appName) {
 def t() {
     node {
         def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
-        for (a in teamApps) {
-            println a
-        }
+
         teamApps.each { team ->
             team.apps.each { app ->
                 createJobs(app.name, app.deploymentType)
             }
             def categorizedViewTxt = """
-                categorizedJobsView(${team.name}) {
+                categorizedJobsView('${team.name}') {
                     jobs {
                         names("'${team.apps.collect{ it.name }.join("','")}'")
                     }
