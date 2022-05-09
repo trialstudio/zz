@@ -67,12 +67,10 @@ def t() {
             println categorizedViewTxt
             addJobDsl(categorizedViewTxt)
         }
-//    createJobs("springV1", "spring-app")
-//    createJobs("miscTaskV1", "misc-task")
     }
 }
 
-static def deploymentTypeMapping() {
+static def deploymentTypeTemplateMapping() {
     return [
             "springV1": new DeploymentVersions("springBuildV1", "argoProdDeployV1", "argoDevDeployV1"),
             "miscTaskV1": new DeploymentVersions("miscTaskBuildV1", "", "")
@@ -82,24 +80,24 @@ static def deploymentTypeMapping() {
 def createJobs(String appName, String deploymentType) {
     def engine = new SimpleTemplateEngine()
 
-    def version = deploymentTypeMapping().get(deploymentType).getBuildVersion()
+    def version = deploymentTypeTemplateMapping().get(deploymentType).getBuildVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
         jobDslPipeline("${appName}-build", renderedScript)
     }
 
-    version = deploymentTypeMapping().get(deploymentType).getDeployToProdVersion()
+    version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToProdVersion()
     if (version?.trim()) {
         def versionFile = "${version}.groovy"
         renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
         jobDslPipeline("${appName}-deploy-to-prod", renderedScript)
     }
 
-    version = deploymentTypeMapping().get(deploymentType).getDeployToDevVersion()
+    version = deploymentTypeTemplateMapping().get(deploymentType).getDeployToDevVersion()
     if (version?.trim()) {
-        def versionFile = "${version}.groovy"
-        renderedScript = engine.createTemplate("${libraryResource versionFile}").make(['appName': "$appName"]).toString()
+//        def versionFile = "${version}.groovy"
+        renderedScript = engine.createTemplate("${libraryResource "${version}.groovy"}").make(['appName': "$appName"]).toString()
         jobDslPipeline("${appName}-deploy-to-dev", renderedScript)
     }
 }
@@ -114,7 +112,6 @@ def jobDslPipeline(String jobName, String renderedPipeline) {
                 }
             }
             """
-    println scriptTxt
 
     addJobDsl(scriptTxt)
 }
