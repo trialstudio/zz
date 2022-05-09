@@ -17,7 +17,7 @@ class BuildAndDeployTemplateRenderer {
     List<HashMap<String, String>> renderEnvironmentTemplate(HashMap<String, String> bindings) {
         return environmentTemplateMap.collect {
             String templateContent = "${libraryResource environmentTemplateMap.get(it.value)}"
-            return [it.key: engine.createTemplate(templateContent).make(bindings).toString()]
+            return [(it.key): engine.createTemplate(templateContent).make(bindings).toString()]
         }
     }
 }
