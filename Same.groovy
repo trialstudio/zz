@@ -1,0 +1,4 @@
+enum Same {
+    one,
+    two
+}

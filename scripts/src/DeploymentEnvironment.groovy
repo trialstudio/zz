@@ -4,3 +4,7 @@ enum DeploymentEnvironment {
     staging,
     prod
 }
+
+this.DeploymentEnvironment = DeploymentEnvironment
+
+return this
