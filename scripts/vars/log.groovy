@@ -48,28 +48,24 @@ def t() {
                 createJobs(app.name, app.deploymentType)
             }
 
-        addJobDsl("""
-            categorizedJobsView(team.name) {
-                jobs {
-                    names("${team.apps.collect{it.name}}")
-                    team.apps.each {
-                        name(it.name)
+            addJobDsl("""
+                categorizedJobsView(${team.name}) {
+                    jobs {
+                        names("'${team.apps.collect { it.name }.join("','")}'")
+                    }
+                    categorizationCriteria {
+                        regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
+                    }
+                    columns {
+                        status()
+                        categorizedJob()
+                        lastSuccess()
+                        lastFailure()
+                        lastDuration()
+                        buildButton()
                     }
                 }
-                categorizationCriteria {
-                    regexGroupingRule(/^(.*)-(ci|dev-promotion|prod-promotion)/)
-                }
-                columns {
-                    status()
-                    categorizedJob()
-                    lastSuccess()
-                    lastFailure()
-                    lastDuration()
-                    buildButton()
-                }
-            }
-            """)
-
+                """)
         }
 //    createJobs("springV1", "spring-app")
 //    createJobs("miscTaskV1", "misc-task")
