@@ -3,7 +3,9 @@ pipeline {
   
   stages {
     stage('one') {
-      echo 'inside test branch'
+      steps {
+        echo 'inside test branch'
+      }
     }
   }
 }
