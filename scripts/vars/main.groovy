@@ -7,20 +7,22 @@ def initialize() {
         }
 
     node('built-in') {
-        def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
+        stage('create or update jobs') {
+            def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
 
-        teamApps.each { team ->
-            team.apps.each { app ->
-                def defaultBindings = ["team": team.name, "app": app.name]
-                switch(app.type) {
-                    case "springboot": addSpringbootPipelines(app.name, renderer, defaultBindings)
-                        break
-                    default: echo 'type not found'
+            teamApps.each { team ->
+                team.apps.each { app ->
+                    def defaultBindings = ["team": team.name, "app": app.name]
+                    switch(app.type) {
+                        case "springboot": addSpringbootPipelines(app.name, renderer, defaultBindings)
+                            break
+                        default: echo 'type not found'
+                    }
                 }
+                addCategorizedViewJobDsl(team.name,
+                        "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
+                        "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
             }
-            addCategorizedViewJobDsl(team.name,
-                    "^(${team.apps.collect { it.name }.join('|')})-(build|deploy-to-dev|deploy-to-prod)",
-                    "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
         }
     }
 }
