@@ -1,3 +1,3 @@
-def run() {
+def gg() {
     println 'running something.groovy'
 }

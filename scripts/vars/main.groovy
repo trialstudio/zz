@@ -1,7 +1,7 @@
 import groovy.text.SimpleTemplateEngine
 
 def test() {
-    something.run()
+    something.gg()
 }
 
 def initialize() {
