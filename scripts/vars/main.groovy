@@ -1,5 +1,9 @@
 import groovy.text.SimpleTemplateEngine
 
+def test() {
+    something.run()
+}
+
 def initialize() {
     def templateEngine = new SimpleTemplateEngine()
     def renderer = { template, bindings ->
