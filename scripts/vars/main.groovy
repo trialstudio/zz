@@ -10,7 +10,7 @@ def initialize() {
             templateEngine.createTemplate("${libraryResource template}").make(bindings).toString()
         }
 
-    node('built-in') {
+//    node('built-in') {
         stage('create or update jobs') {
             def teamApps = readYaml text: "${libraryResource 'team-apps.yaml'}"
 
@@ -28,7 +28,7 @@ def initialize() {
                         "^(.*)-(build|deploy-to-dev|deploy-to-prod)")
             }
         }
-    }
+//    }
 }
 
 def addSpringbootPipelines(String app, Closure renderer, HashMap<String, String> defaultBindings) {
